@@ -1,3 +1,3 @@
 Build NESEmu restart + save/load + 8-way joystick
-Trigger after complete source chunks upload.
-2026-08-19 final IPA build.
+Trigger graphics/audio fix build with relocated SAVE/LOAD buttons.
+2026-08-19 final corrected IPA build.
