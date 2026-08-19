@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract project ZIP and apply iOS v12 files
+      - name: Extract project ZIP and apply iOS v13 files
         run: |
           set -e
           rm -rf ios-src
@@ -28,6 +28,13 @@ jobs:
           import UIKit\
           ' ios-src/CTJModernTooliOS/Models.swift
           tail -n +2 patches/PlayerPortraitSupport.swift >> ios-src/CTJModernTooliOS/Models.swift
+          tail -n +2 patches/LargeDiscImport_v13.swift >> ios-src/CTJModernTooliOS/Models.swift
+
+          # Use the memory-mapped importer for large BIN/ISO files.
+          sed -i '' 's/model\.importDisc(url:url)/model.importLargeDiscSafely(url: url)/g' ios-src/CTJModernTooliOS/ContentView.swift
+
+          # Do not hard-code one game filename in the UI.
+          sed -i '' 's/CTJ\.bin/ملف اللعبة/g' ios-src/CTJModernTooliOS/ContentView.swift
 
       - name: Select Xcode
         run: |
@@ -85,12 +92,12 @@ jobs:
           rm -rf Payload
           mkdir -p Payload
           cp -R "$APP" Payload/
-          zip -qry CTJ_Modern_Tool_v42-v12-unsigned.ipa Payload
-          test -s CTJ_Modern_Tool_v42-v12-unsigned.ipa
+          zip -qry CTJ_Modern_Tool_v42-v13-unsigned.ipa Payload
+          test -s CTJ_Modern_Tool_v42-v13-unsigned.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: CTJ_Modern_Tool_v42-v12-unsigned-IPA
-          path: ios-src/CTJ_Modern_Tool_v42-v12-unsigned.ipa
+          name: CTJ_Modern_Tool_v42-v13-unsigned-IPA
+          path: ios-src/CTJ_Modern_Tool_v42-v13-unsigned.ipa
           if-no-files-found: error
