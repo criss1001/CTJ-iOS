@@ -10,9 +10,20 @@ jobs:
     runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+
+      - name: Extract project ZIP
+        run: |
+          set -e
+          rm -rf ios-src
+          mkdir ios-src
+          unzip -q CTJ_Modern_Tool_v42_iOS_IPA_BUILD_READY.zip -d ios-src
+          test -f ios-src/CTJModernTooliOS.xcodeproj/project.pbxproj
+
       - name: Select Xcode
         run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer || true
+
       - name: Build unsigned app
+        working-directory: ios-src
         run: |
           set -e
           xcodebuild \
@@ -25,16 +36,22 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             build
+
       - name: Package IPA
+        working-directory: ios-src
         run: |
           set -e
           APP=$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' -print -quit)
           test -n "$APP"
+          rm -rf Payload
           mkdir -p Payload
           cp -R "$APP" Payload/
           zip -qry CTJ_Modern_Tool_v42-unsigned.ipa Payload
+          test -s CTJ_Modern_Tool_v42-unsigned.ipa
+
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
           name: CTJ_Modern_Tool_v42-unsigned-IPA
-          path: CTJ_Modern_Tool_v42-unsigned.ipa
+          path: ios-src/CTJ_Modern_Tool_v42-unsigned.ipa
+          if-no-files-found: error
