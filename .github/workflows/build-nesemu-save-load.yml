@@ -3,6 +3,8 @@ name: Build NESEmu Save Load
 on:
   push:
     branches: [ nesemu-save-load ]
+  pull_request:
+    branches: [ main ]
   workflow_dispatch:
 
 permissions:
