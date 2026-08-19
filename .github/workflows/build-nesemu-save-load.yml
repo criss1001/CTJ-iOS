@@ -19,10 +19,20 @@ jobs:
       - name: Recreate NESEmu source
         run: |
           set -e
-          cat nesemu_build/source.b64.* > source.b64
-          python3 -c "import base64,pathlib; pathlib.Path('nesemu_source.zip').write_bytes(base64.b64decode(pathlib.Path('source.b64').read_bytes()))"
+          python3 - <<'PY'
+          import base64, pathlib, re
+          parts = []
+          for p in sorted(pathlib.Path('nesemu_build').glob('source.b64.[0-9][0-9]')):
+              parts.append(re.sub(rb'\s+', b'', p.read_bytes()))
+          s = b''.join(parts)
+          s += b'=' * ((4 - len(s) % 4) % 4)
+          data = base64.b64decode(s)
+          pathlib.Path('nesemu_source.zip').write_bytes(data)
+          print('decoded zip bytes:', len(data))
+          PY
           rm -rf nesemu-src
           mkdir nesemu-src
+          unzip -t nesemu_source.zip
           unzip -q nesemu_source.zip -d nesemu-src
           test -f nesemu-src/project.yml
           test -f nesemu-src/NESEmu/UI/ContentView.swift
