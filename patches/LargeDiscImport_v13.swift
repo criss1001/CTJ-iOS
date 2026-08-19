@@ -15,7 +15,7 @@ extension CTJModel {
                 return
             }
 
-            // Map the file into virtual memory instead of allocating/copying the whole BIN in RAM.
+            // Map the large BIN/ISO into virtual memory instead of allocating a second full copy in RAM.
             let mapped = try Data(contentsOf: url, options: [.mappedIfSafe])
             guard mapped.count > 32 * 1024 else {
                 status = "ملف اللعبة صغير جدًا ليكون صورة قرص PS1"
@@ -23,17 +23,20 @@ extension CTJModel {
             }
 
             do {
-                let image = try PSXDiscImage(data: mapped)
+                // Validate the image before publishing it to the UI. PSXDiscImage is a value parser;
+                // CTJModel keeps the mapped Data and derives the file list from it when needed.
+                _ = try PSXDiscImage(data: mapped)
                 discData = mapped
                 discName = url.lastPathComponent
-                discImage = image
                 status = "تم فتح \(url.lastPathComponent) — \(fileSize / 1_048_576) MB"
             } catch {
                 discData = Data()
-                discImage = nil
+                discName = ""
                 status = "تعذر تحليل صورة القرص: \(error.localizedDescription) — الحجم \(fileSize / 1_048_576) MB"
             }
         } catch {
+            discData = Data()
+            discName = ""
             status = "فشل فتح ملف اللعبة: \(error.localizedDescription)"
         }
     }
