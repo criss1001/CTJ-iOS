@@ -1,0 +1,86 @@
+name: Build NESEmu Save Load
+
+on:
+  push:
+    branches: [ nesemu-save-load ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Recreate NESEmu source
+        run: |
+          set -e
+          cat nesemu_build/source.b64.* > source.b64
+          python3 -c "import base64,pathlib; pathlib.Path('nesemu_source.zip').write_bytes(base64.b64decode(pathlib.Path('source.b64').read_bytes()))"
+          rm -rf nesemu-src
+          mkdir nesemu-src
+          unzip -q nesemu_source.zip -d nesemu-src
+          test -f nesemu-src/project.yml
+          test -f nesemu-src/NESEmu/UI/ContentView.swift
+
+      - name: Select Xcode
+        run: |
+          set -e
+          XCODE=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -n 1)
+          if [ -n "$XCODE" ]; then sudo xcode-select -s "$XCODE/Contents/Developer"; fi
+          xcodebuild -version
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        working-directory: nesemu-src
+        run: xcodegen generate
+
+      - name: Build unsigned iOS app
+        working-directory: nesemu-src
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p build
+          xcodebuild \
+            -project NESEmu.xcodeproj \
+            -scheme NESEmu \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$PWD/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY='' \
+            DEVELOPMENT_TEAM='' \
+            build 2>&1 | tee build.log
+
+      - name: Package unsigned IPA
+        working-directory: nesemu-src
+        run: |
+          set -e
+          APP=$(find DerivedData/Build/Products/Release-iphoneos -maxdepth 1 -name 'NESEmu.app' -print -quit)
+          test -n "$APP"
+          rm -rf Payload
+          mkdir Payload
+          cp -R "$APP" Payload/
+          zip -qry NESEmu-build.ipa Payload
+          test -s NESEmu-build.ipa
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: NESEmu-build-log
+          path: nesemu-src/build.log
+          if-no-files-found: ignore
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: NESEmu-ipa
+          path: nesemu-src/NESEmu-build.ipa
+          if-no-files-found: error
