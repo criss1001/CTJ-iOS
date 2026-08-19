@@ -1,5 +1,12 @@
 import Foundation
 
+final class LargeDiscStore {
+    static let shared = LargeDiscStore()
+    private init() {}
+    var data: Data?
+    var sourceURL: URL?
+}
+
 extension CTJModel {
     @MainActor
     func importLargeDiscSafely(url: URL) {
@@ -15,7 +22,7 @@ extension CTJModel {
                 return
             }
 
-            // Map the large BIN/ISO into virtual memory instead of allocating a second full copy in RAM.
+            // Map instead of copying the full BIN into RAM.
             let mapped = try Data(contentsOf: url, options: [.mappedIfSafe])
             guard mapped.count > 32 * 1024 else {
                 status = "ملف اللعبة صغير جدًا ليكون صورة قرص PS1"
@@ -23,21 +30,33 @@ extension CTJModel {
             }
 
             do {
-                // Validate the image before publishing it to the UI. PSXDiscImage is a value parser;
-                // CTJModel keeps the mapped Data and derives the file list from it when needed.
-                _ = try PSXDiscImage(data: mapped)
-                discData = mapped
+                let image = try PSXDiscImage(data: mapped)
+
+                // Keep the hundreds-of-megabytes image OUT of @Published discData.
+                // Publishing such a large value can trigger extra copies / SwiftUI memory pressure.
+                LargeDiscStore.shared.data = mapped
+                LargeDiscStore.shared.sourceURL = url
+                discData = Data([0x01])
                 discName = url.lastPathComponent
-                status = "تم فتح \(url.lastPathComponent) — \(fileSize / 1_048_576) MB"
+                discFiles = image.files
+                status = "تم فتح \(url.lastPathComponent) — \(fileSize / 1_048_576) MB — \(image.files.count) ملف"
             } catch {
+                LargeDiscStore.shared.data = nil
+                LargeDiscStore.shared.sourceURL = nil
                 discData = Data()
-                discName = ""
+                discFiles = []
                 status = "تعذر تحليل صورة القرص: \(error.localizedDescription) — الحجم \(fileSize / 1_048_576) MB"
             }
         } catch {
+            LargeDiscStore.shared.data = nil
+            LargeDiscStore.shared.sourceURL = nil
             discData = Data()
-            discName = ""
+            discFiles = []
             status = "فشل فتح ملف اللعبة: \(error.localizedDescription)"
         }
+    }
+
+    var effectiveDiscData: Data {
+        LargeDiscStore.shared.data ?? discData
     }
 }
