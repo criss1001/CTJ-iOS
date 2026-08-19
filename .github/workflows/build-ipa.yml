@@ -20,22 +20,38 @@ jobs:
           test -f ios-src/CTJModernTooliOS.xcodeproj/project.pbxproj
 
       - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer || true
+        run: |
+          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer || true
+          xcodebuild -version
+
+      - name: Inspect project
+        working-directory: ios-src
+        run: xcodebuild -project CTJModernTooliOS.xcodeproj -list
 
       - name: Build unsigned app
         working-directory: ios-src
+        shell: bash
         run: |
-          set -e
+          set -o pipefail
           xcodebuild \
             -project CTJModernTooliOS.xcodeproj \
-            -scheme CTJModernTooliOS \
+            -target CTJModernTooliOS \
             -configuration Release \
             -sdk iphoneos \
             -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            build
+            DEVELOPMENT_TEAM="" \
+            build 2>&1 | tee xcodebuild.log
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log
+          path: ios-src/xcodebuild.log
+          if-no-files-found: ignore
 
       - name: Package IPA
         working-directory: ios-src
