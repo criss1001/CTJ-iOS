@@ -14,20 +14,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract project ZIP and apply iOS v11 fixes
+      - name: Extract project ZIP and apply iOS v11 files
         run: |
           set -e
           rm -rf ios-src
           mkdir ios-src
           unzip -q CTJ_Modern_Tool_v42_iOS_IPA_BUILD_READY.zip -d ios-src
           test -f ios-src/CTJModernTooliOS.xcodeproj/project.pbxproj
-          cp patches/ContentView_v10.swift ios-src/CTJModernTooliOS/ContentView.swift
+          cp patches/ContentView_v11.swift ios-src/CTJModernTooliOS/ContentView.swift
           cp patches/CTJModernTooliOSApp_v11.swift ios-src/CTJModernTooliOS/CTJModernTooliOSApp.swift
           sed -i '' '1i\
           import UIKit\
           ' ios-src/CTJModernTooliOS/Models.swift
           tail -n +2 patches/PlayerPortraitSupport.swift >> ios-src/CTJModernTooliOS/Models.swift
-          python3 scripts/apply_v11.py
 
       - name: Select Xcode
         run: |
