@@ -35,15 +35,15 @@ ExecuteExternalTool /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/X
 
 ExecuteExternalTool /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
 
-Build description signature: c91d861c70bf5f893f9c184dac623386
-Build description path: /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/XCBuildData/c91d861c70bf5f893f9c184dac623386.xcbuilddata
-CreateBuildDirectory /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build
-    cd /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS.xcodeproj
-    builtin-create-build-directory /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build
-
+Build description signature: 289c1c550d62a4eb16e8b89011eab271
+Build description path: /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/XCBuildData/289c1c550d62a4eb16e8b89011eab271.xcbuilddata
 ClangStatCache /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk /var/folders/_5/zjnzxgh147qcg3bb5cg2wvqw0000gn/C/com.apple.DeveloperTools/16.4-16F6/Xcode/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache
     cd /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS.xcodeproj
     /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -o /var/folders/_5/zjnzxgh147qcg3bb5cg2wvqw0000gn/C/com.apple.DeveloperTools/16.4-16F6/Xcode/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache
+
+CreateBuildDirectory /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build
+    cd /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS.xcodeproj
+    builtin-create-build-directory /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build
 
 WriteAuxiliaryFile /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS-6dc8640590db27a94c39c96057fe3d1a-VFS-iphoneos/all-product-headers.yaml
     cd /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS.xcodeproj
@@ -193,13 +193,13 @@ CopyPNGFile /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos/CT
     cd /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src
     /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/Resources/team_logos/1F.png /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos/CTJModernTooliOS.app/1F.png
 
-CopyPNGFile /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos/CTJModernTooliOS.app/1E.png /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/Resources/team_logos/1E.png (in target 'CTJModernTooliOS' from project 'CTJModernTooliOS')
-    cd /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src
-    /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/Resources/team_logos/1E.png /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos/CTJModernTooliOS.app/1E.png
-
 CopyPNGFile /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos/CTJModernTooliOS.app/1D.png /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/Resources/team_logos/1D.png (in target 'CTJModernTooliOS' from project 'CTJModernTooliOS')
     cd /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src
     /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/Resources/team_logos/1D.png /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos/CTJModernTooliOS.app/1D.png
+
+CopyPNGFile /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos/CTJModernTooliOS.app/1E.png /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/Resources/team_logos/1E.png (in target 'CTJModernTooliOS' from project 'CTJModernTooliOS')
+    cd /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src
+    /Applications/Xcode_16.4.app/Contents/Developer/usr/bin/copypng -compress -strip-PNG-text /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/Resources/team_logos/1E.png /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos/CTJModernTooliOS.app/1E.png
 
 CopyPNGFile /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos/CTJModernTooliOS.app/1C.png /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/Resources/team_logos/1C.png (in target 'CTJModernTooliOS' from project 'CTJModernTooliOS')
     cd /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src
@@ -326,30 +326,65 @@ SwiftCompile normal arm64 Compiling\ CTJModernTooliOSApp.swift,\ Models.swift,\ 
 CompileSwift normal arm64 (in target 'CTJModernTooliOS' from project 'CTJModernTooliOS')
     cd /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src
     
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:100:1: error: expected '}' in struct
+
+^
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:82:29: note: to match this opening '{'
+struct ShotEditorView: View {
+                            ^
 /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/Models.swift:403:17: warning: variable 'image' was never mutated; consider changing to 'let' constant
             var image = try PSXDiscImage(data: discData)
             ~~~ ^
             let
-/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:129:52: error: cannot assign value of type '[UInt8]' to type '[Int]'
-            Button("تحميل السجل") { bytes=model.playerRecord(model.selectedPlayer) }
-/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:129:52: note: arguments to generic parameter 'Element' ('UInt8' and 'Int') are expected to be equal
-            Button("تحميل السجل") { bytes=model.playerRecord(model.selectedPlayer) }
-/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:140:58: error: cannot assign value of type '[UInt8]' to type '[Int]'
-    }.navigationTitle("Player Editor") }.onAppear { bytes=model.playerRecord(model.selectedPlayer) }.onChange(of:model.selectedPlayer){_,_ in bytes=model.playerRecord(model.selectedPlayer)} }
-                                                         ^
-/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:140:58: note: arguments to generic parameter 'Element' ('UInt8' and 'Int') are expected to be equal
-    }.navigationTitle("Player Editor") }.onAppear { bytes=model.playerRecord(model.selectedPlayer) }.onChange(of:model.selectedPlayer){_,_ in bytes=model.playerRecord(model.selectedPlayer)} }
-                                                         ^
-/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:140:148: error: cannot assign value of type '[UInt8]' to type '[Int]'
-    }.navigationTitle("Player Editor") }.onAppear { bytes=model.playerRecord(model.selectedPlayer) }.onChange(of:model.selectedPlayer){_,_ in bytes=model.playerRecord(model.selectedPlayer)} }
-                                                                                                                                                   ^
-/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:140:148: note: arguments to generic parameter 'Element' ('UInt8' and 'Int') are expected to be equal
-    }.navigationTitle("Player Editor") }.onAppear { bytes=model.playerRecord(model.selectedPlayer) }.onChange(of:model.selectedPlayer){_,_ in bytes=model.playerRecord(model.selectedPlayer)} }
-                                                                                                                                                   ^
-/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:141:169: error: cannot assign value of type 'UInt8' to subscript of type 'Int'
-    @ViewBuilder func stat(_ name:String,_ i:Int,_ range:ClosedRange<Int>)->some View { Stepper("\(name): \(bytes[i])", value:Binding(get:{Int(bytes[i])},set:{bytes[i]=UInt8(clamping:$0)}), in:range) }
-                                                                                                                                                                        ^~~~~~~~~~~~~~~~~~
-                                                                                                                                                                        Int(              )
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:24:46: error: value of type 'CTJModel' has no dynamic member 'importKind' using key path from root type 'CTJModel'
+            Button("Import TEAMDAT") { model.importKind = .team; model.showImporter = true }
+                                       ~~~~~ ^~~~~~~~~~
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:24:40: error: referencing subscript 'subscript(dynamicMember:)' requires wrapper 'EnvironmentObject<CTJModel>.Wrapper'
+            Button("Import TEAMDAT") { model.importKind = .team; model.showImporter = true }
+                                       ^
+                                       $
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:24:60: error: type 'Binding<_>' has no member 'team'
+            Button("Import TEAMDAT") { model.importKind = .team; model.showImporter = true }
+                                                          ~^~~~
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:28:38: error: value of type 'EnvironmentObject<CTJModel>.Wrapper' has no dynamic member 'showImporter' using key path from root type 'CTJModel'
+    .fileImporter(isPresented:$model.showImporter, allowedContentTypes:[.data], allowsMultipleSelection:false) { result in model.handleImport(result) }
+                              ~~~~~~ ^~~~~~~~~~~~
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:28:130: error: value of type 'CTJModel' has no dynamic member 'handleImport' using key path from root type 'CTJModel'
+    .fileImporter(isPresented:$model.showImporter, allowedContentTypes:[.data], allowsMultipleSelection:false) { result in model.handleImport(result) }
+                                                                                                                           ~~~~~ ^~~~~~~~~~~~
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:28:124: error: referencing subscript 'subscript(dynamicMember:)' requires wrapper 'EnvironmentObject<CTJModel>.Wrapper'
+    .fileImporter(isPresented:$model.showImporter, allowedContentTypes:[.data], allowsMultipleSelection:false) { result in model.handleImport(result) }
+                                                                                                                           ^
+                                                                                                                           $
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:28:130: error: cannot call value of non-function type 'Binding<Subject>'
+    .fileImporter(isPresented:$model.showImporter, allowedContentTypes:[.data], allowsMultipleSelection:false) { result in model.handleImport(result) }
+                                                                                                                                 ^
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:37:9: error: generic parameter 'V' could not be inferred
+        Section("PS1 BIN / ISO") {
+        ^
+SwiftUI.Section.init:2:20: note: in call to initializer
+nonisolated public init<V>(_ titleKey: LocalizedStringKey, @TableRowBuilder<V> content: () -> Content) where Parent == TableHeaderRowContent<V, Text>, Footer == EmptyTableRowContent<V>, V == Content.TableRowValue}
+                   ^
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:57:118: error: value of type 'CTJModel' has no dynamic member 'handleDiscImport' using key path from root type 'CTJModel'
+    .fileImporter(isPresented:$showDiscImporter, allowedContentTypes:[.data], allowsMultipleSelection:false) { model.handleDiscImport($0) }
+                                                                                                               ~~~~~ ^~~~~~~~~~~~~~~~
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:57:112: error: referencing subscript 'subscript(dynamicMember:)' requires wrapper 'EnvironmentObject<CTJModel>.Wrapper'
+    .fileImporter(isPresented:$showDiscImporter, allowedContentTypes:[.data], allowsMultipleSelection:false) { model.handleDiscImport($0) }
+                                                                                                               ^
+                                                                                                               $
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:57:118: error: cannot call value of non-function type 'Binding<Subject>'
+    .fileImporter(isPresented:$showDiscImporter, allowedContentTypes:[.data], allowsMultipleSelection:false) { model.handleDiscImport($0) }
+                                                                                                                     ^
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:96:33: error: cannot call value of non-function type 'Binding<Subject>'
+        Button("Apply") { model.applyShot(mode:mode, source:source, target:target); source=nil; target=nil }.buttonStyle(.borderedProminent).padding(.bottom)
+                                ^
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:96:33: error: value of type 'CTJModel' has no dynamic member 'applyShot' using key path from root type 'CTJModel'
+        Button("Apply") { model.applyShot(mode:mode, source:source, target:target); source=nil; target=nil }.buttonStyle(.borderedProminent).padding(.bottom)
+                          ~~~~~ ^~~~~~~~~
+/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift:96:27: error: referencing subscript 'subscript(dynamicMember:)' requires wrapper 'EnvironmentObject<CTJModel>.Wrapper'
+        Button("Apply") { model.applyShot(mode:mode, source:source, target:target); source=nil; target=nil }.buttonStyle(.borderedProminent).padding(.bottom)
+                          ^
+                          $
 
 Failed frontend command:
 /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/CTJModernTooliOSApp.swift /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/Models.swift /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/CTJModernTooliOS/ContentView.swift -supplementary-output-file-map /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/Objects-normal/arm64/supplementaryOutputs-1 -emit-localized-strings -emit-localized-strings-path /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/Objects-normal/arm64 -target arm64-apple-ios17.0 -Xllvm -aarch64-use-tbi -enable-objc-interop -stack-check -sdk /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.5.sdk -I /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos -F /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos -no-color-diagnostics -g -debug-info-format\=dwarf -dwarf-version\=4 -swift-version 5 -enforce-exclusivity\=checked -O -serialize-debugging-options -const-gather-protocols-file /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/Objects-normal/arm64/CTJModernTooliOS_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /var/folders/_5/zjnzxgh147qcg3bb5cg2wvqw0000gn/C/org.llvm.clang/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src -resource-dir /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift -file-compilation-dir /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src -Xcc -ivfsstatcache -Xcc /var/folders/_5/zjnzxgh147qcg3bb5cg2wvqw0000gn/C/com.apple.DeveloperTools/16.4-16F6/Xcode/SDKStatCaches.noindex/iphoneos18.5-22F76-a529daf784b3616c7c04a36aeb7f5c05.sdkstatcache -Xcc -I/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/CTJModernTooliOS-generated-files.hmap -Xcc -I/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/CTJModernTooliOS-own-target-headers.hmap -Xcc -I/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/CTJModernTooliOS-all-target-headers.hmap -Xcc -iquote -Xcc /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/CTJModernTooliOS-project-headers.hmap -Xcc -I/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/Release-iphoneos/include -Xcc -I/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/DerivedSources -module-name CTJModernTooliOS -frontend-parseable-output -disable-clang-spi -target-sdk-version 18.5 -target-sdk-name iphoneos18.5 -external-plugin-path /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins\#/Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/local/lib/swift/host/plugins\#/Applications/Xcode_16.4.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -in-process-plugin-server-path /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -plugin-path /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins -plugin-path /Applications/Xcode_16.4.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/local/lib/swift/host/plugins -enable-default-cmo -num-threads 3 -o /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/Objects-normal/arm64/CTJModernTooliOSApp.o -o /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/Objects-normal/arm64/Models.o -o /Users/runner/work/CTJ-iOS/CTJ-iOS/ios-src/build/CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/Objects-normal/arm64/ContentView.o -index-unit-output-path /CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/Objects-normal/arm64/CTJModernTooliOSApp.o -index-unit-output-path /CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/Objects-normal/arm64/Models.o -index-unit-output-path /CTJModernTooliOS.build/Release-iphoneos/CTJModernTooliOS.build/Objects-normal/arm64/ContentView.o
