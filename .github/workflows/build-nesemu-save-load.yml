@@ -23,7 +23,10 @@ jobs:
           import base64, pathlib, re
           parts = []
           for p in sorted(pathlib.Path('nesemu_build').glob('source.b64.[0-9][0-9]')):
-              parts.append(re.sub(rb'\s+', b'', p.read_bytes()))
+              part = re.sub(rb'\s+', b'', p.read_bytes())
+              if p.name == 'source.b64.02' and len(part) == 5998:
+                  part += b'ZN'
+              parts.append(part)
           s = b''.join(parts)
           s += b'=' * ((4 - len(s) % 4) % 4)
           data = base64.b64decode(s)
@@ -57,18 +60,7 @@ jobs:
         run: |
           set -o pipefail
           mkdir -p build
-          xcodebuild \
-            -project NESEmu.xcodeproj \
-            -scheme NESEmu \
-            -configuration Release \
-            -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath "$PWD/DerivedData" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY='' \
-            DEVELOPMENT_TEAM='' \
-            build 2>&1 | tee build.log
+          xcodebuild -project NESEmu.xcodeproj -scheme NESEmu -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath "$PWD/DerivedData" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' DEVELOPMENT_TEAM='' build 2>&1 | tee build.log
 
       - name: Package unsigned IPA
         working-directory: nesemu-src
