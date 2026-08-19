@@ -110,7 +110,13 @@ struct DiscToolsView: View {
             }.navigationTitle("PS1 BIN").navigationBarTitleDisplayMode(.inline)
         }
         .fileImporter(isPresented:$importDisc, allowedContentTypes:[.item], allowsMultipleSelection:false) { result in
-            switch result { case .success(let u): model.importDisc(url:u); case .failure(let e): model.status="اختيار الملف فشل: \(e.localizedDescription)" }
+            switch result {
+            case .success(let urls):
+                if let url = urls.first { model.importDisc(url:url) }
+                else { model.status = "لم يتم اختيار ملف" }
+            case .failure(let e):
+                model.status="اختيار الملف فشل: \(e.localizedDescription)"
+            }
         }
         .fileExporter(isPresented:$exportDisc, document:DataDocument(data:model.discData), contentType:.data, defaultFilename:patchedDiscName) {_ in}
     }
@@ -166,4 +172,28 @@ struct ShotEditorView: View {
     func desc(_ r:ShotRecord?)->String{guard let r else{return "—"};return String(format:"ID %02X / slot %02X",r.playerID,r.shotSlot)}
 }
 
-struct TeamLogosView:View{let columns=[GridItem(.adaptive(minimum:82),spacing:12)];var body:some View{NavigationStack{ScrollView{LazyVGrid(columns:columns,spacing:16){ForEach(0..<0x2D,id:\.self){i in VStack{Image(String(format:"%02X",i)).interpolation(.none).resizable().scaledToFit().frame(width:72,height:60).background(.black.opacity(0.3)).clipShape(RoundedRectangle(cornerRadius:10));Text("TEAM \(String(format:"%02X",i))").font(.caption.bold())}}}.padding()}.navigationTitle("Team Logos 00–2C").navigationBarTitleDisplayMode(.inline)}}
+struct TeamLogosView: View {
+    let columns = [GridItem(.adaptive(minimum:82),spacing:12)]
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                LazyVGrid(columns:columns,spacing:16) {
+                    ForEach(0..<0x2D,id:\.self) { i in
+                        VStack {
+                            Image(String(format:"%02X",i))
+                                .interpolation(.none)
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width:72,height:60)
+                                .background(.black.opacity(0.3))
+                                .clipShape(RoundedRectangle(cornerRadius:10))
+                            Text("TEAM \(String(format:"%02X",i))").font(.caption.bold())
+                        }
+                    }
+                }.padding()
+            }
+            .navigationTitle("Team Logos 00–2C")
+            .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+}
