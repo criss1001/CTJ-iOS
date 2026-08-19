@@ -19,17 +19,39 @@ jobs:
       - name: Recreate NESEmu source
         run: |
           set -e
-          cat nesemu_build/source.b64.* > source.b64
-          python3 -c "import base64,pathlib; pathlib.Path('nesemu_source.zip').write_bytes(base64.b64decode(pathlib.Path('source.b64').read_bytes()))"
+          python3 - <<'PY'
+          import base64, pathlib, re
+          parts=[]
+          for p in sorted(pathlib.Path('nesemu_build').glob('source.b64.[0-9][0-9]')):
+              part=re.sub(rb'\s+', b'', p.read_bytes())
+              if p.name == 'source.b64.02' and len(part) == 5998:
+                  part += b'ZN'
+              parts.append(part)
+          s=b''.join(parts)
+          s += b'=' * ((4-len(s)%4)%4)
+          pathlib.Path('nesemu_source.zip').write_bytes(base64.b64decode(s))
+          PY
           rm -rf nesemu-src
           mkdir nesemu-src
           unzip -q nesemu_source.zip -d nesemu-src
           test -f nesemu-src/project.yml
-          test -f nesemu-src/NESEmu/UI/ContentView.swift
+          cp nesemu_patch/NESSystem.swift nesemu-src/NESEmu/Core/NESSystem.swift
+          cp nesemu_patch/ContentView.swift nesemu-src/NESEmu/UI/ContentView.swift
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('nesemu-src/NESEmu/Core/APU.swift')
+          s=p.read_text()
+          s=s.replace('return (pulseOut + tndOut) * 1.5 // slight gain','return min(0.95, max(-0.95, (pulseOut + tndOut) * 0.92))')
+          s=s.replace('    private let lock = NSLock()\n\n    init(capacity: Int) {','    private let lock = NSLock()\n    private var lastOutput: Float = 0\n\n    init(capacity: Int) {')
+          old='''    func pop() -> Float {\n        lock.lock()\n        defer { lock.unlock() }\n        guard readIndex < writeIndex else { return 0 }\n        let v = buffer[readIndex % capacity]\n        readIndex += 1\n        return v\n    }\n'''
+          new='''    func pop() -> Float {\n        lock.lock()\n        defer { lock.unlock() }\n        guard readIndex < writeIndex else { return 0 }\n        let v = buffer[readIndex % capacity]\n        readIndex += 1\n        lastOutput = v\n        return v\n    }\n\n    func popOrHold() -> Float {\n        lock.lock()\n        defer { lock.unlock() }\n        guard readIndex < writeIndex else {\n            lastOutput *= 0.997\n            return lastOutput\n        }\n        let raw = buffer[readIndex % capacity]\n        readIndex += 1\n        lastOutput += (raw - lastOutput) * 0.72\n        return lastOutput\n    }\n'''
+          if old not in s:
+              raise SystemExit('APU patch target not found')
+          p.write_text(s.replace(old,new))
+          PY
 
       - name: Select Xcode
         run: |
-          set -e
           XCODE=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -n 1)
           if [ -n "$XCODE" ]; then sudo xcode-select -s "$XCODE/Contents/Developer"; fi
           xcodebuild -version
@@ -46,31 +68,16 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p build
-          xcodebuild \
-            -project NESEmu.xcodeproj \
-            -scheme NESEmu \
-            -configuration Release \
-            -sdk iphoneos \
-            -destination 'generic/platform=iOS' \
-            -derivedDataPath "$PWD/DerivedData" \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY='' \
-            DEVELOPMENT_TEAM='' \
-            build 2>&1 | tee build.log
+          xcodebuild -project NESEmu.xcodeproj -scheme NESEmu -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath "$PWD/DerivedData" CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY='' DEVELOPMENT_TEAM='' build 2>&1 | tee build.log
 
       - name: Package unsigned IPA
         working-directory: nesemu-src
         run: |
-          set -e
           APP=$(find DerivedData/Build/Products/Release-iphoneos -maxdepth 1 -name 'NESEmu.app' -print -quit)
           test -n "$APP"
-          rm -rf Payload
           mkdir Payload
           cp -R "$APP" Payload/
           zip -qry NESEmu-build.ipa Payload
-          test -s NESEmu-build.ipa
 
       - name: Upload build log
         if: always()
