@@ -1,2 +1,3 @@
 Build NESEmu restart + save/load + 8-way joystick
 Trigger after default-branch workflow install.
+Trigger PR workflow.
