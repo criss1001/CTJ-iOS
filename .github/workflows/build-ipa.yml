@@ -21,6 +21,7 @@ jobs:
           mkdir ios-src
           unzip -q CTJ_Modern_Tool_v42_iOS_IPA_BUILD_READY.zip -d ios-src
           test -f ios-src/CTJModernTooliOS.xcodeproj/project.pbxproj
+          cp patches/ContentView.swift ios-src/CTJModernTooliOS/ContentView.swift
 
       - name: Select Xcode
         run: |
