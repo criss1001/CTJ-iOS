@@ -33,12 +33,13 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
+          mkdir -p build
           xcodebuild \
             -project CTJModernTooliOS.xcodeproj \
             -target CTJModernTooliOS \
             -configuration Release \
             -sdk iphoneos \
-            -derivedDataPath build \
+            SYMROOT="$PWD/build" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
@@ -57,7 +58,7 @@ jobs:
         working-directory: ios-src
         run: |
           set -e
-          APP=$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' -print -quit)
+          APP=$(find build/Release-iphoneos -maxdepth 1 -name '*.app' -print -quit)
           test -n "$APP"
           rm -rf Payload
           mkdir -p Payload
