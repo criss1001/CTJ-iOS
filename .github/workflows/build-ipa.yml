@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract project ZIP and apply iOS v14 file-backed engine
+      - name: Extract project ZIP and apply iOS v15 auto-load engine
         run: |
           set -e
           rm -rf ios-src
@@ -29,10 +29,37 @@ jobs:
           import UIKit\
           ' ios-src/CTJModernTooliOS/Models.swift
           tail -n +2 patches/PlayerPortraitSupport_v14.swift >> ios-src/CTJModernTooliOS/Models.swift
+          tail -n +3 patches/AutoLoad_v15.swift >> ios-src/CTJModernTooliOS/Models.swift
 
-          # Open any selected BIN/ISO using FileHandle only; never load the whole disc into Data/RAM.
+          # Open any selected BIN/ISO using FileHandle only.
           sed -i '' 's/model\.importDisc(url:url)/model.importDiscFileBacked(url: url)/g' ios-src/CTJModernTooliOS/ContentView.swift
           sed -i '' 's/CTJ\.bin/ملف اللعبة/g' ios-src/CTJModernTooliOS/ContentView.swift
+
+          # Auto-load CAPTIN/TEAMDAT immediately after the disc index has been created.
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('ios-src/CTJModernTooliOS/Models.swift')
+          s=p.read_text()
+          needle='selectedDiscPath = reader.files.first(where:{ !$0.isDirectory && $0.name.uppercased()=="CAPTIN.EXE" })?.path ?? ""\n            status = "✅ تم فتح \\(discName) — \\(discFileCount) ملف"'
+          repl='selectedDiscPath = reader.files.first(where:{ !$0.isDirectory && $0.name.uppercased()=="CAPTIN.EXE" })?.path ?? ""\n            autoLoadGameAssets()'
+          if needle not in s:
+              raise SystemExit('auto-load insertion point not found')
+          s=s.replace(needle,repl,1)
+          p.write_text(s)
+          PY
+
+          # Use flexible portrait lookup and refresh stats automatically after TEAMDAT is loaded.
+          sed -i '' 's/portrait=model\.playerPortrait(team:model\.selectedTeam,player:model\.selectedPlayer)/portrait=model.playerPortraitAuto(team:model.selectedTeam,player:model.selectedPlayer)/g' ios-src/CTJModernTooliOS/ContentView.swift
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('ios-src/CTJModernTooliOS/ContentView.swift')
+          s=p.read_text()
+          old='.onChange(of:model.discName){_,_ in refreshPortrait()}'
+          new='.onChange(of:model.discName){_,_ in refreshPortrait()}\n            .onChange(of:model.teamDataName){_,_ in bytes=model.playerRecord(model.selectedPlayer); refreshPortrait()}'
+          if old in s:
+              s=s.replace(old,new,1)
+          p.write_text(s)
+          PY
 
       - name: Select Xcode
         run: |
@@ -90,12 +117,12 @@ jobs:
           rm -rf Payload
           mkdir -p Payload
           cp -R "$APP" Payload/
-          zip -qry CTJ_Modern_Tool_v42-v14-unsigned.ipa Payload
-          test -s CTJ_Modern_Tool_v42-v14-unsigned.ipa
+          zip -qry CTJ_Modern_Tool_v42-v15-unsigned.ipa Payload
+          test -s CTJ_Modern_Tool_v42-v15-unsigned.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: CTJ_Modern_Tool_v42-v14-unsigned-IPA
-          path: ios-src/CTJ_Modern_Tool_v42-v14-unsigned.ipa
+          name: CTJ_Modern_Tool_v42-v15-unsigned-IPA
+          path: ios-src/CTJ_Modern_Tool_v42-v15-unsigned.ipa
           if-no-files-found: error
