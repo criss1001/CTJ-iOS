@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract project ZIP and apply iOS v13 safe large-disc files
+      - name: Extract project ZIP and apply iOS v14 file-backed engine
         run: |
           set -e
           rm -rf ios-src
@@ -24,19 +24,14 @@ jobs:
           cp patches/ContentView_v11.swift ios-src/CTJModernTooliOS/ContentView.swift
           cp patches/CTJModernTooliOSApp_v11.swift ios-src/CTJModernTooliOS/CTJModernTooliOSApp.swift
           python3 -c "import gzip,base64,pathlib; p=pathlib.Path('patches/Models_v12.swift.gz.b64'); pathlib.Path('ios-src/CTJModernTooliOS/Models.swift').write_bytes(gzip.decompress(base64.b64decode(p.read_bytes())))"
+          python3 -c "from pathlib import Path; p=Path('ios-src/CTJModernTooliOS/Models.swift'); s=p.read_text(); marker='extension CTJModel {\n    var discFileCount'; i=s.index(marker); fb=Path('patches/FileBackedPSXDisc_v14.swift').read_text(); fb='\n'.join(x for x in fb.splitlines() if not x.startswith('import ')); p.write_text(s[:i]+fb+'\n')"
           sed -i '' '1i\
           import UIKit\
           ' ios-src/CTJModernTooliOS/Models.swift
-          tail -n +2 patches/PlayerPortraitSupport.swift >> ios-src/CTJModernTooliOS/Models.swift
-          tail -n +2 patches/LargeDiscImport_v13.swift >> ios-src/CTJModernTooliOS/Models.swift
+          tail -n +2 patches/PlayerPortraitSupport_v14.swift >> ios-src/CTJModernTooliOS/Models.swift
 
-          # Use memory-mapped importer and never publish the whole 600+ MB image to SwiftUI.
-          sed -i '' 's/model\.importDisc(url:url)/model.importLargeDiscSafely(url: url)/g' ios-src/CTJModernTooliOS/ContentView.swift
-
-          # All read-only disc parsing paths use the private large-disc store when available.
-          sed -i '' 's/PSXDiscImage(data: discData)/PSXDiscImage(data: effectiveDiscData)/g' ios-src/CTJModernTooliOS/Models.swift
-
-          # Do not hard-code one game filename in the UI.
+          # Open any selected BIN/ISO using FileHandle only; never load the whole disc into Data/RAM.
+          sed -i '' 's/model\.importDisc(url:url)/model.importDiscFileBacked(url: url)/g' ios-src/CTJModernTooliOS/ContentView.swift
           sed -i '' 's/CTJ\.bin/ملف اللعبة/g' ios-src/CTJModernTooliOS/ContentView.swift
 
       - name: Select Xcode
@@ -95,12 +90,12 @@ jobs:
           rm -rf Payload
           mkdir -p Payload
           cp -R "$APP" Payload/
-          zip -qry CTJ_Modern_Tool_v42-v13b-unsigned.ipa Payload
-          test -s CTJ_Modern_Tool_v42-v13b-unsigned.ipa
+          zip -qry CTJ_Modern_Tool_v42-v14-unsigned.ipa Payload
+          test -s CTJ_Modern_Tool_v42-v14-unsigned.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: CTJ_Modern_Tool_v42-v13b-unsigned-IPA
-          path: ios-src/CTJ_Modern_Tool_v42-v13b-unsigned.ipa
+          name: CTJ_Modern_Tool_v42-v14-unsigned-IPA
+          path: ios-src/CTJ_Modern_Tool_v42-v14-unsigned.ipa
           if-no-files-found: error
