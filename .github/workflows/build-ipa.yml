@@ -14,14 +14,23 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract project ZIP
+      - name: Extract project ZIP and apply minimal Swift fix
         run: |
           set -e
           rm -rf ios-src
           mkdir ios-src
           unzip -q CTJ_Modern_Tool_v42_iOS_IPA_BUILD_READY.zip -d ios-src
           test -f ios-src/CTJModernTooliOS.xcodeproj/project.pbxproj
-          cp patches/ContentView.swift ios-src/CTJModernTooliOS/ContentView.swift
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('ios-src/CTJModernTooliOS/ContentView.swift')
+          s = p.read_text()
+          old = '@State private var bytes = Array(repeating:0, count:16)'
+          new = '@State private var bytes: [UInt8] = Array(repeating: 0, count: 16)'
+          if old not in s and new not in s:
+              raise SystemExit('Expected PlayerEditor bytes declaration not found')
+          p.write_text(s.replace(old, new))
+          PY
 
       - name: Select Xcode
         run: |
