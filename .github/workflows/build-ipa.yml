@@ -14,23 +14,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract project ZIP and apply minimal Swift fix
+      - name: Extract project ZIP and apply iOS v10 fixes
         run: |
           set -e
           rm -rf ios-src
           mkdir ios-src
           unzip -q CTJ_Modern_Tool_v42_iOS_IPA_BUILD_READY.zip -d ios-src
           test -f ios-src/CTJModernTooliOS.xcodeproj/project.pbxproj
-          python3 - <<'PY'
-          from pathlib import Path
-          p = Path('ios-src/CTJModernTooliOS/ContentView.swift')
-          s = p.read_text()
-          old = '@State private var bytes = Array(repeating:0, count:16)'
-          new = '@State private var bytes: [UInt8] = Array(repeating: 0, count: 16)'
-          if old not in s and new not in s:
-              raise SystemExit('Expected PlayerEditor bytes declaration not found')
-          p.write_text(s.replace(old, new))
-          PY
+          cp patches/ContentView_v10.swift ios-src/CTJModernTooliOS/ContentView.swift
+          sed -i '' '1i\
+          import UIKit\
+          ' ios-src/CTJModernTooliOS/Models.swift
+          tail -n +2 patches/PlayerPortraitSupport.swift >> ios-src/CTJModernTooliOS/Models.swift
 
       - name: Select Xcode
         run: |
@@ -88,12 +83,12 @@ jobs:
           rm -rf Payload
           mkdir -p Payload
           cp -R "$APP" Payload/
-          zip -qry CTJ_Modern_Tool_v42-unsigned.ipa Payload
-          test -s CTJ_Modern_Tool_v42-unsigned.ipa
+          zip -qry CTJ_Modern_Tool_v42-v10-unsigned.ipa Payload
+          test -s CTJ_Modern_Tool_v42-v10-unsigned.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: CTJ_Modern_Tool_v42-unsigned-IPA
-          path: ios-src/CTJ_Modern_Tool_v42-unsigned.ipa
+          name: CTJ_Modern_Tool_v42-v10-unsigned-IPA
+          path: ios-src/CTJ_Modern_Tool_v42-v10-unsigned.ipa
           if-no-files-found: error
