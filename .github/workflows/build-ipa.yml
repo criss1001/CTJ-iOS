@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract project ZIP and apply iOS v13 files
+      - name: Extract project ZIP and apply iOS v13 safe large-disc files
         run: |
           set -e
           rm -rf ios-src
@@ -30,8 +30,11 @@ jobs:
           tail -n +2 patches/PlayerPortraitSupport.swift >> ios-src/CTJModernTooliOS/Models.swift
           tail -n +2 patches/LargeDiscImport_v13.swift >> ios-src/CTJModernTooliOS/Models.swift
 
-          # Use the memory-mapped importer for large BIN/ISO files.
+          # Use memory-mapped importer and never publish the whole 600+ MB image to SwiftUI.
           sed -i '' 's/model\.importDisc(url:url)/model.importLargeDiscSafely(url: url)/g' ios-src/CTJModernTooliOS/ContentView.swift
+
+          # All read-only disc parsing paths use the private large-disc store when available.
+          sed -i '' 's/PSXDiscImage(data: discData)/PSXDiscImage(data: effectiveDiscData)/g' ios-src/CTJModernTooliOS/Models.swift
 
           # Do not hard-code one game filename in the UI.
           sed -i '' 's/CTJ\.bin/ملف اللعبة/g' ios-src/CTJModernTooliOS/ContentView.swift
@@ -92,12 +95,12 @@ jobs:
           rm -rf Payload
           mkdir -p Payload
           cp -R "$APP" Payload/
-          zip -qry CTJ_Modern_Tool_v42-v13-unsigned.ipa Payload
-          test -s CTJ_Modern_Tool_v42-v13-unsigned.ipa
+          zip -qry CTJ_Modern_Tool_v42-v13b-unsigned.ipa Payload
+          test -s CTJ_Modern_Tool_v42-v13b-unsigned.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: CTJ_Modern_Tool_v42-v13-unsigned-IPA
-          path: ios-src/CTJ_Modern_Tool_v42-v13-unsigned.ipa
+          name: CTJ_Modern_Tool_v42-v13b-unsigned-IPA
+          path: ios-src/CTJ_Modern_Tool_v42-v13b-unsigned.ipa
           if-no-files-found: error
