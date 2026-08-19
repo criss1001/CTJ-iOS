@@ -1,139 +1,93 @@
-name: Build CTJ iOS IPA
+name: Temporary Build NESEmu IPA
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ main, master ]
+    branches: [ main ]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout NESEmu build branch
+        uses: actions/checkout@v4
+        with:
+          ref: nesemu-save-load
 
-      - name: Extract project ZIP and apply iOS v16 landscape full-screen
+      - name: Recreate source
         run: |
           set -e
-          rm -rf ios-src
-          mkdir ios-src
-          unzip -q CTJ_Modern_Tool_v42_iOS_IPA_BUILD_READY.zip -d ios-src
-          test -f ios-src/CTJModernTooliOS.xcodeproj/project.pbxproj
-          cp patches/ContentView_v11.swift ios-src/CTJModernTooliOS/ContentView.swift
-          cp patches/CTJModernTooliOSApp_v11.swift ios-src/CTJModernTooliOS/CTJModernTooliOSApp.swift
-          python3 -c "import gzip,base64,pathlib; p=pathlib.Path('patches/Models_v12.swift.gz.b64'); pathlib.Path('ios-src/CTJModernTooliOS/Models.swift').write_bytes(gzip.decompress(base64.b64decode(p.read_bytes())))"
-          python3 -c "from pathlib import Path; p=Path('ios-src/CTJModernTooliOS/Models.swift'); s=p.read_text(); marker='extension CTJModel {\n    var discFileCount'; i=s.index(marker); fb=Path('patches/FileBackedPSXDisc_v14.swift').read_text(); fb='\n'.join(x for x in fb.splitlines() if not x.startswith('import ')); p.write_text(s[:i]+fb+'\n')"
-          sed -i '' '1i\
-          import UIKit\
-          ' ios-src/CTJModernTooliOS/Models.swift
-          tail -n +2 patches/PlayerPortraitSupport_v14.swift >> ios-src/CTJModernTooliOS/Models.swift
-          tail -n +3 patches/AutoLoad_v15.swift >> ios-src/CTJModernTooliOS/Models.swift
-
-          # Open selected BIN/ISO using FileHandle only.
-          sed -i '' 's/model\.importDisc(url:url)/model.importDiscFileBacked(url: url)/g' ios-src/CTJModernTooliOS/ContentView.swift
-          sed -i '' 's/CTJ\.bin/ملف اللعبة/g' ios-src/CTJModernTooliOS/ContentView.swift
-
-          # Auto-load CAPTIN/TEAMDAT immediately after disc indexing.
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('ios-src/CTJModernTooliOS/Models.swift')
-          s=p.read_text()
-          needle='selectedDiscPath = reader.files.first(where:{ !$0.isDirectory && $0.name.uppercased()=="CAPTIN.EXE" })?.path ?? ""\n            status = "✅ تم فتح \\(discName) — \\(discFileCount) ملف"'
-          repl='selectedDiscPath = reader.files.first(where:{ !$0.isDirectory && $0.name.uppercased()=="CAPTIN.EXE" })?.path ?? ""\n            autoLoadGameAssets()'
-          if needle not in s:
-              raise SystemExit('auto-load insertion point not found')
-          s=s.replace(needle,repl,1)
-          p.write_text(s)
-          PY
-
-          # Flexible portrait lookup and automatic stat refresh.
-          sed -i '' 's/portrait=model\.playerPortrait(team:model\.selectedTeam,player:model\.selectedPlayer)/portrait=model.playerPortraitAuto(team:model.selectedTeam,player:model.selectedPlayer)/g' ios-src/CTJModernTooliOS/ContentView.swift
-          python3 - <<'PY'
-          from pathlib import Path
-          p=Path('ios-src/CTJModernTooliOS/ContentView.swift')
-          s=p.read_text()
-          old='.onChange(of:model.discName){_,_ in refreshPortrait()}'
-          new='.onChange(of:model.discName){_,_ in refreshPortrait()}\n            .onChange(of:model.teamDataName){_,_ in bytes=model.playerRecord(model.selectedPlayer); refreshPortrait()}'
-          if old in s:
-              s=s.replace(old,new,1)
-
-          # Fill the physical landscape screen and hide system overlays while the app is open.
-          old2='        .frame(maxWidth: .infinity, maxHeight: .infinity)\n        .tint(.cyan)'
-          new2='        .frame(maxWidth: .infinity, maxHeight: .infinity)\n        .ignoresSafeArea(.container, edges: .all)\n        .persistentSystemOverlays(.hidden)\n        .tint(.cyan)'
-          if old2 not in s:
-              raise SystemExit('full-screen insertion point not found')
-          s=s.replace(old2,new2,1)
-          p.write_text(s)
-          PY
+          cat nesemu_build/source.b64.* > source.b64
+          python3 -c "import base64,pathlib; pathlib.Path('nesemu_source.zip').write_bytes(base64.b64decode(pathlib.Path('source.b64').read_bytes()))"
+          rm -rf nesemu-src
+          mkdir nesemu-src
+          unzip -q nesemu_source.zip -d nesemu-src
+          test -f nesemu-src/project.yml
 
       - name: Select Xcode
         run: |
-          sudo xcode-select -s /Applications/Xcode_16.4.app/Contents/Developer || true
+          XCODE=$(ls -d /Applications/Xcode_*.app 2>/dev/null | sort -V | tail -n 1)
+          if [ -n "$XCODE" ]; then sudo xcode-select -s "$XCODE/Contents/Developer"; fi
           xcodebuild -version
 
-      - name: Inspect project
-        working-directory: ios-src
-        run: xcodebuild -project CTJModernTooliOS.xcodeproj -list
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate project
+        working-directory: nesemu-src
+        run: xcodegen generate
 
       - name: Build unsigned app
-        working-directory: ios-src
+        working-directory: nesemu-src
         shell: bash
         run: |
           set -o pipefail
-          mkdir -p build
           xcodebuild \
-            -project CTJModernTooliOS.xcodeproj \
-            -target CTJModernTooliOS \
+            -project NESEmu.xcodeproj \
+            -scheme NESEmu \
             -configuration Release \
             -sdk iphoneos \
-            SYMROOT="$PWD/build" \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath "$PWD/DerivedData" \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            DEVELOPMENT_TEAM="" \
-            INFOPLIST_KEY_UISupportedInterfaceOrientations="UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight" \
-            INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone="UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight" \
-            INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad="UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight" \
-            INFOPLIST_KEY_UIRequiresFullScreen=YES \
-            build 2>&1 | tee xcodebuild.log
-
-      - name: Upload build log
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: xcodebuild-log
-          path: ios-src/xcodebuild.log
-          if-no-files-found: ignore
-
-      - name: Persist failure log
-        if: failure()
-        run: |
-          if [ -f ios-src/xcodebuild.log ]; then
-            cp ios-src/xcodebuild.log LATEST_XCODEBUILD_ERROR.log
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add LATEST_XCODEBUILD_ERROR.log
-            git diff --cached --quiet || git commit -m "Capture xcodebuild failure [skip ci]"
-            git push
-          fi
+            CODE_SIGN_IDENTITY='' \
+            DEVELOPMENT_TEAM='' \
+            build 2>&1 | tee build.log
 
       - name: Package IPA
-        working-directory: ios-src
+        working-directory: nesemu-src
         run: |
           set -e
-          APP=$(find build/Release-iphoneos -maxdepth 1 -name '*.app' -print -quit)
+          APP=$(find DerivedData/Build/Products/Release-iphoneos -maxdepth 1 -name 'NESEmu.app' -print -quit)
           test -n "$APP"
           rm -rf Payload
-          mkdir -p Payload
+          mkdir Payload
           cp -R "$APP" Payload/
-          zip -qry CTJ_Modern_Tool_v42-v16-landscape-fullscreen-unsigned.ipa Payload
-          test -s CTJ_Modern_Tool_v42-v16-landscape-fullscreen-unsigned.ipa
+          zip -qry NESEmu-build.ipa Payload
+          test -s NESEmu-build.ipa
 
-      - name: Upload IPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: CTJ_Modern_Tool_v42-v16-landscape-fullscreen-unsigned-IPA
-          path: ios-src/CTJ_Modern_Tool_v42-v16-landscape-fullscreen-unsigned.ipa
-          if-no-files-found: error
+      - name: Store successful build
+        if: success()
+        run: |
+          cp nesemu-src/NESEmu-build.ipa NESEmu-build.ipa
+          rm -f NESEmu-build-error.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add NESEmu-build.ipa NESEmu-build-error.log || true
+          git commit -m "Store NESEmu build [skip ci]" || exit 0
+          git push origin HEAD:nesemu-save-load
+
+      - name: Store failure log
+        if: failure()
+        run: |
+          test -f nesemu-src/build.log || exit 0
+          cp nesemu-src/build.log NESEmu-build-error.log
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add NESEmu-build-error.log
+          git commit -m "Store NESEmu build error [skip ci]" || exit 0
+          git push origin HEAD:nesemu-save-load
