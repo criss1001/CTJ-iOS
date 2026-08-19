@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract project ZIP and apply iOS v15 auto-load engine
+      - name: Extract project ZIP and apply iOS v16 landscape full-screen
         run: |
           set -e
           rm -rf ios-src
@@ -31,11 +31,11 @@ jobs:
           tail -n +2 patches/PlayerPortraitSupport_v14.swift >> ios-src/CTJModernTooliOS/Models.swift
           tail -n +3 patches/AutoLoad_v15.swift >> ios-src/CTJModernTooliOS/Models.swift
 
-          # Open any selected BIN/ISO using FileHandle only.
+          # Open selected BIN/ISO using FileHandle only.
           sed -i '' 's/model\.importDisc(url:url)/model.importDiscFileBacked(url: url)/g' ios-src/CTJModernTooliOS/ContentView.swift
           sed -i '' 's/CTJ\.bin/ملف اللعبة/g' ios-src/CTJModernTooliOS/ContentView.swift
 
-          # Auto-load CAPTIN/TEAMDAT immediately after the disc index has been created.
+          # Auto-load CAPTIN/TEAMDAT immediately after disc indexing.
           python3 - <<'PY'
           from pathlib import Path
           p=Path('ios-src/CTJModernTooliOS/Models.swift')
@@ -48,7 +48,7 @@ jobs:
           p.write_text(s)
           PY
 
-          # Use flexible portrait lookup and refresh stats automatically after TEAMDAT is loaded.
+          # Flexible portrait lookup and automatic stat refresh.
           sed -i '' 's/portrait=model\.playerPortrait(team:model\.selectedTeam,player:model\.selectedPlayer)/portrait=model.playerPortraitAuto(team:model.selectedTeam,player:model.selectedPlayer)/g' ios-src/CTJModernTooliOS/ContentView.swift
           python3 - <<'PY'
           from pathlib import Path
@@ -58,6 +58,13 @@ jobs:
           new='.onChange(of:model.discName){_,_ in refreshPortrait()}\n            .onChange(of:model.teamDataName){_,_ in bytes=model.playerRecord(model.selectedPlayer); refreshPortrait()}'
           if old in s:
               s=s.replace(old,new,1)
+
+          # Fill the physical landscape screen and hide system overlays while the app is open.
+          old2='        .frame(maxWidth: .infinity, maxHeight: .infinity)\n        .tint(.cyan)'
+          new2='        .frame(maxWidth: .infinity, maxHeight: .infinity)\n        .ignoresSafeArea(.container, edges: .all)\n        .persistentSystemOverlays(.hidden)\n        .tint(.cyan)'
+          if old2 not in s:
+              raise SystemExit('full-screen insertion point not found')
+          s=s.replace(old2,new2,1)
           p.write_text(s)
           PY
 
@@ -86,6 +93,10 @@ jobs:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
             DEVELOPMENT_TEAM="" \
+            INFOPLIST_KEY_UISupportedInterfaceOrientations="UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight" \
+            INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone="UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight" \
+            INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad="UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight" \
+            INFOPLIST_KEY_UIRequiresFullScreen=YES \
             build 2>&1 | tee xcodebuild.log
 
       - name: Upload build log
@@ -117,12 +128,12 @@ jobs:
           rm -rf Payload
           mkdir -p Payload
           cp -R "$APP" Payload/
-          zip -qry CTJ_Modern_Tool_v42-v15-unsigned.ipa Payload
-          test -s CTJ_Modern_Tool_v42-v15-unsigned.ipa
+          zip -qry CTJ_Modern_Tool_v42-v16-landscape-fullscreen-unsigned.ipa Payload
+          test -s CTJ_Modern_Tool_v42-v16-landscape-fullscreen-unsigned.ipa
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
         with:
-          name: CTJ_Modern_Tool_v42-v15-unsigned-IPA
-          path: ios-src/CTJ_Modern_Tool_v42-v15-unsigned.ipa
+          name: CTJ_Modern_Tool_v42-v16-landscape-fullscreen-unsigned-IPA
+          path: ios-src/CTJ_Modern_Tool_v42-v16-landscape-fullscreen-unsigned.ipa
           if-no-files-found: error
